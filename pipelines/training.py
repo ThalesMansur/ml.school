@@ -43,6 +43,7 @@ configure_logging()
         "mlflow",
         "setuptools",
         "python-dotenv",
+        "psutil",
     ),
 )
 class Training(FlowSpec, FlowMixin):
@@ -92,6 +93,7 @@ class Training(FlowSpec, FlowMixin):
             # experiment to the Metaflow run identifier so we can easily
             # recognize which experiment corresponds with each run.
             run = mlflow.start_run(run_name=current.run_id)
+            mlflow.log_artifact('pipelines/training.py', 'training.py')
             self.mlflow_run_id = run.info.run_id
         except Exception as e:
             message = f"Failed to connect to MLflow server {self.mlflow_tracking_uri}."
