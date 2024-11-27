@@ -2,6 +2,8 @@ python-dotenv
 pytest
 pylint
 
+bzip2
+
 mlflow
 mlflow[extras]
 mlserver
