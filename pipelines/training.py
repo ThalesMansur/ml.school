@@ -44,6 +44,8 @@ configure_logging()
         "setuptools",
         "python-dotenv",
         "psutil",
+        "matplotlib",
+        "seaborn"
     ),
 )
 class Training(FlowSpec, FlowMixin):
@@ -239,6 +241,11 @@ class Training(FlowSpec, FlowMixin):
         the model using the test data for this fold.
         """
         import mlflow
+        from sklearn.metrics import confusion_matrix
+        import matplotlib.pyplot as plt
+        import seaborn as sns
+        import numpy as np
+        from metaflow.cards import Image
 
         logging.info("Evaluating fold %d...", self.fold)
 
@@ -268,6 +275,40 @@ class Training(FlowSpec, FlowMixin):
                 },
             )
 
+        #Predict the species of a penguin and use a confusion matrix to evaluate the model 
+        # Let's predict the species of the penguins using the model we trained during
+        # the cross-validation process.
+        self.y_pred = self.model.predict(self.x_test)
+
+
+        # Generate confusion matrix
+        self.confusion_matrix = confusion_matrix(
+            self.y_test,
+            self.y_pred.argmax(axis=1),
+        )
+
+        # Create a plot of the confusion matrix
+        fig, ax = plt.subplots(figsize=(8, 6))
+        sns.heatmap(self.confusion_matrix, annot=True, fmt='d', cmap='Blues', ax=ax)
+        ax.set_xlabel('Predicted Labels')
+        ax.set_ylabel('True Labels')
+        ax.set_title('Confusion Matrix')
+
+        # Save the plot as an image
+        image_path = '/tmp/confusion_matrix.png'  # Temporary path to save the image
+        plt.savefig(image_path)
+        plt.close(fig)
+
+        # Add the image to the Metaflow card
+        current.card.append(Image.from_matplotlib(fig, label="Confusion Matrix"))
+
+        # # Let's log the confusion matrix on the parent run.
+        # mlflow.log_metrics(
+        #     {
+        #         "confusion_matrix": self.confusion_matrix,
+        #     },
+        # )
+
         # When we finish evaluating every fold in the cross-validation process, we want
         # to evaluate the overall performance of the model by averaging the scores from
         # each fold.
@@ -283,6 +324,7 @@ class Training(FlowSpec, FlowMixin):
         """
         import mlflow
         import numpy as np
+        from sklearn.metrics import confusion_matrix
 
         # We need access to the `mlflow_run_id` and `mlflow_tracking_uri` artifacts
         # that we set at the start of the flow, but since we are in a join step, we
