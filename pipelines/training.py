@@ -155,6 +155,7 @@ class Training(FlowSpec, FlowMixin):
         # We can now build the SciKit-Learn pipeline to process the target column,
         # fit it to the training data and transform both the training and test data.
         target_transformer = build_target_transformer()
+        self.target_transformer = target_transformer
         self.y_train = target_transformer.fit_transform(
             species[self.train_indices],
         )
@@ -280,8 +281,7 @@ class Training(FlowSpec, FlowMixin):
         # Let's predict the species of the penguins using the model we trained during
         # the cross-validation process.
         self.y_pred = self.model.predict(self.x_test)
-
-
+               
         # Generate confusion matrix
         self.confusion_matrix = confusion_matrix(
             self.y_test,
@@ -294,6 +294,9 @@ class Training(FlowSpec, FlowMixin):
         ax.set_xlabel('Predicted Labels')
         ax.set_ylabel('True Labels')
         ax.set_title('Confusion Matrix')
+        ax.set_xticklabels(self.target_transformer.named_transformers_['species'].categories_[0], rotation=45)
+        ax.set_yticklabels(self.target_transformer.named_transformers_['species'].categories_[0], rotation=0)
+
 
         # # Save the plot as an image
         # image_path = '/tmp/confusion_matrix.png'  # Temporary path to save the image
