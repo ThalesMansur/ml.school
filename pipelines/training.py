@@ -45,7 +45,8 @@ configure_logging()
         "python-dotenv",
         "psutil",
         "matplotlib",
-        "seaborn"
+        "seaborn",
+        "pynvml"
     ),
 )
 class Training(FlowSpec, FlowMixin):
@@ -294,10 +295,10 @@ class Training(FlowSpec, FlowMixin):
         ax.set_ylabel('True Labels')
         ax.set_title('Confusion Matrix')
 
-        # Save the plot as an image
-        image_path = '/tmp/confusion_matrix.png'  # Temporary path to save the image
-        plt.savefig(image_path)
-        plt.close(fig)
+        # # Save the plot as an image
+        # image_path = '/tmp/confusion_matrix.png'  # Temporary path to save the image
+        # plt.savefig(image_path)
+        # plt.close(fig)
 
         # Add the image to the Metaflow card
         current.card.append(Image.from_matplotlib(fig, label="Confusion Matrix"))
