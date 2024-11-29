@@ -29,6 +29,7 @@ PACKAGES = {
     "psutil": "6.1.0",
     "matplotlib": "3.9.2",
     "seaborn": "0.13.2",
+    "pynvml": "11.5.3",
 }
 
 TRAINING_EPOCHS = 50
